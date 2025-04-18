@@ -24,7 +24,7 @@ define('OCR_OUT_FILE_PATH', 'ocr.json');
 define('OCR_RESPONSE_FORMAT', 'text');
  
 
-$ocrClient = OCRClient::getInstance(OCR_URL, OCR_TOKEN, OCR_MODEL,OCR_RESPONSE_FORMAT);
+$ocrClient = OCRClient::getInstance(OCR_URL, OCR_TOKEN, OCR_MODEL,OCR_RESPONSE_FORMAT,__DIR__.'/temp' );
 $myDatabase = myDatabase::getInstance(DB_HOST_MASTER    ,  DB_USERNAME_MASTER   , DB_PASSWORD_MASTER ,DB_DATABASE_MASTER , DB_PORT_MASTER);
 $logClient = myLogClient::getInstance(__DIR__.'/temp','mysql', $myDatabase );
 $App =   Appocr::getInstance('ypc_news_base' , 'article_content','article_id' );  

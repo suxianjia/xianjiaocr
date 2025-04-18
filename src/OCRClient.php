@@ -8,6 +8,7 @@ class OCRClient {
     private $token;
     private $model;
     private $responseFormat;
+    private static  $TEMP_IMAGE_PATH ;
 
     private static $instance = null;
     private static $imagesMaxSize = 3 * 1024 * 1024; // 3MB
@@ -77,22 +78,23 @@ public static function compressImage($imagePath): array {
 public function __clone() {}
 public function __wakeup() {}
 
-public static function getInstance($url, $token, $model, $responseFormat = 'json') {
+public static function getInstance(string $url,string  $token, string  $model, $responseFormat = 'json', string $tempImagePathString) {
+    self::$TEMP_IMAGE_PATH = $tempImagePathString;
     if (self::$instance === null) {
         self::$instance = new self($url, $token, $model, $responseFormat);
     }
     return self::$instance;
 }
 
-public function processImage($imagePath): array {
+public function processImage($remoteImagePath): array {
     $results = ['code' => 500, 'msg' => 'Failed', 'data' => null];
 
-        $tempImagePath = __DIR__ . '/tempImagePath/' . basename($imagePath);
+        $tempImagePath = self::$TEMP_IMAGE_PATH .'/'. basename($remoteImagePath);
         try {
-            echo "准备图片路径为：" . $imagePath .PHP_EOL;  
-            $imageData = file_get_contents($imagePath);
+            echo "准备远程图片路径为：" . $remoteImagePath .PHP_EOL;  
+            $imageData = file_get_contents($remoteImagePath);
             if ($imageData === false) {
-                throw new Exception('Failed to download image: ' . $imagePath . '-->'. time() );
+                throw new Exception('Failed to download image: ' . $remoteImagePath . '-->'. time() );
             }
 
         } catch (Exception $e) {
