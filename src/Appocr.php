@@ -32,7 +32,7 @@ class Appocr {
  
 
     private function reSaveArticleToDatabase(string $table_ontent, int $table_id, myDatabase $myDatabase) : array   {
-        $results = ['code' => 500, 'msg' => 'Failed', 'data' => null];
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
         $mysqli = $myDatabase->getConnection();
         try {
             $stmt = $mysqli->prepare("UPDATE `".self::$tableName."` SET `".self::$contentName."` = ? WHERE `".self::$idName."` = ?");
@@ -47,13 +47,13 @@ class Appocr {
             $results = ['code' => 200, 'msg' => 'Article resaved successfully.', 'data' => ['id' => $table_id]];
             $stmt->close();
         } catch (Exception $e) {
-            $results = ['code' => 500, 'msg' => 'Database error: ' . $e->getMessage(), 'data' => null];
+            $results = ['code' => 500, 'msg' => 'Database error: ' . $e->getMessage(), 'data' => []  ];
         }
         return $results;
     }
 
     public function processAllArticles(OCRClient $ocrClient, myDatabase $myDatabase, myLogClient $logClient): array {
-        $results = ['code' => 500, 'msg' => 'Failed', 'data' => null];
+        $results = ['code' => 500, 'msg' => 'Failed', 'data' =>  []  ];
         try {
             $mysqli = $myDatabase->getConnection();
             $pageSize = 1000;
@@ -103,7 +103,7 @@ class Appocr {
                         } else {
                             echo "|---> ocrResult error: {$ocrResult['code']} -- {$ocrResult['msg']} " . PHP_EOL;
                         }
-                        echo "|---> articleId = $table_id -- imagePath = $imagePath -- ocrDatatext = $ocrDatatext " . PHP_EOL;
+                        echo "|---> table_id = $table_id -- imagePath = $imagePath -- ocrDatatext = $ocrDatatext " . PHP_EOL;
 
                 
 
@@ -120,7 +120,7 @@ class Appocr {
                 $stmt->close();
             }
         } catch (Exception $e) {
-            $results = ['code' => 500, 'msg' => 'Error: ' . $e->getMessage(), 'data' => null];
+            $results = ['code' => 500, 'msg' => 'Error: ' . $e->getMessage(), 'data' => []   ];
         } finally {
             $myDatabase->close();
         }

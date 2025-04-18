@@ -21,9 +21,9 @@ class OCRClient {
     }
 // 图片文件大小超过 3MB，需要压缩图片处理，并重新生成新的图片文件
 public static function compressImage($imagePath): array {
-    $results = ['code' => 500, 'msg' => 'Failed', 'data' => null];
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
     $imagesMaxSize = self::$imagesMaxSize; // 最大图片大小 3MB
-    $compressedImagePath = __DIR__ . '/tempImagePath/compressed_' . basename($imagePath);
+    $compressedImagePath = self::$TEMP_IMAGE_PATH . '/compressed_' . basename($imagePath);
 
     try {
         $imageInfo = getimagesize($imagePath);
@@ -87,7 +87,7 @@ public static function getInstance(string $url,string  $token, string  $model, $
 }
 
 public function processImage($remoteImagePath): array {
-    $results = ['code' => 500, 'msg' => 'Failed', 'data' => null];
+    $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
 
         $tempImagePath = self::$TEMP_IMAGE_PATH .'/'. basename($remoteImagePath);
         try {
