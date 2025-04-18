@@ -1,15 +1,11 @@
 <?php
-namespace xianjiaocr;
+ include_once __DIR__."/../vendor/autoload.php";
 
-use xianjiaocr\App;
-use xianjiaocr\OCRClient;
-use xianjiaocr\myDatabase;
-
-// define('DB_HOST_MASTER', 'rm-7xvqz50859y717cv0.mysql.rds.aliyuncs.com');
-// define('DB_PORT_MASTER', 3308);
-// define('DB_DATABASE_MASTER', 'www_u_petrol_com');
-// define('DB_USERNAME_MASTER', 'w_api_user_master8');
-// define('DB_PASSWORD_MASTER', 'Wdbfd_tdh@8Wirte0Db');
+use Suxianjia\xianjiaocr\Appocr;
+use Suxianjia\xianjiaocr\OCRClient;
+use Suxianjia\xianjiaocr\myDatabase;
+use Suxianjia\xianjiaocr\myLogClient;  
+ 
 
 define('DB_HOST_MASTER', '127.0.01');
 define('DB_PORT_MASTER', 3306);
@@ -17,18 +13,7 @@ define('DB_DATABASE_MASTER', 'www_u_petrol_com');
 define('DB_USERNAME_MASTER', 'root');
 define('DB_PASSWORD_MASTER', '654321mm');
 
-
-
-
-
-
-
-
-
-
-// class myLog {}
-
-
+ 
 // Example usage
 define('OCR_URL', 'https://ai.gitee.com/v1/images/ocr');
 // define('OCR_TOKEN', 'AVQX8TQWGAOMLQQSSXB2F5Q0VPTFJV1W3HTQIH1E');//临时的 
@@ -40,16 +25,16 @@ define('OCR_RESPONSE_FORMAT', 'text');
  
 
 $ocrClient = OCRClient::getInstance(OCR_URL, OCR_TOKEN, OCR_MODEL,OCR_RESPONSE_FORMAT);
-$myDatabase = myDatabase::getInstance();
-
-$App = new App('ypc_news_base' , 'article_content','article_id', 'mysql' );  
-$result = $App->processAllArticles($ocrClient, $myDatabase);
+$myDatabase = myDatabase::getInstance(DB_HOST_MASTER    ,  DB_USERNAME_MASTER   , DB_PASSWORD_MASTER ,DB_DATABASE_MASTER , DB_PORT_MASTER);
+$logClient = myLogClient::getInstance(__DIR__.'/temp','mysql', $myDatabase );
+$App =   Appocr::getInstance('ypc_news_base' , 'article_content','article_id' );  
+$result = $App->processAllArticles($ocrClient, $myDatabase,$logClient);
 
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
 
 
 
-// 使用方法 yx-dev@Mac php % php82 ocr.php 
+// 使用方法  cd /ocr/code/demo   &&  php82 test.php 
 
  
  

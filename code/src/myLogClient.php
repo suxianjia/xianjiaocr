@@ -1,12 +1,40 @@
 <?php
-namespace xianjiaocr;
+namespace Suxianjia\xianjiaocr;
+use Exception;
 
+class myLogClient {
+    private static $instance = null;
+    private static   $CREATE_SQL = "CREATE TABLE IF NOT EXISTS `image_ocr_log` (
+        `id` int NOT NULL AUTO_INCREMENT COMMENT '唯一标识符',
+        `current_id` int DEFAULT NULL COMMENT '当前id',
+        `id_name` varchar(40) DEFAULT NULL COMMENT '表ID',
+        `content_name` varchar(40) DEFAULT NULL COMMENT '表内容',
+        `table_name` varchar(40) DEFAULT NULL COMMENT '表名',
+        `image_path` varchar(255) DEFAULT NULL COMMENT '图片路径',
+        `image_size` int DEFAULT NULL COMMENT '图片大小',
+        `image_path_index` varchar(40) DEFAULT NULL COMMENT '图片路径的MD5值',
+        `ocr_data_text` text COMMENT 'OCR数据文本',
+        `create_time` timestamp NULL DEFAULT NULL COMMENT '时间戳',
+        PRIMARY KEY (`id`),
+        KEY `image` (`image_path_index`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ";
+    private static $LOG_FILE_PATH;
+    private static $LOG_MODEL;
 
-class myLog {
- 
+    private static $MY_DATABASE;
+    public static function getInstance( $logFilePath ,$logmodel,$myDatabase ) {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        self::$LOG_FILE_PATH = $logFilePath;
+        self::$LOG_MODEL=$logmodel;
+        self::$MY_DATABASE = $myDatabase;
+        return self::$instance;
+    }
 
-    public  static function writeLog(string $logModel ,int $current_id, string $idName, string $contentName, string $tableName,  string $imagePath, string $ocrDataText, myDatabase $myDatabase): array {
+    public  static function writeLog( int $current_id, string $idName, string $contentName, string $tableName,  string $imagePath, string $ocrDataText): array {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
+ 
         $image_ocr_log = [
             'current_id' => $current_id, // 当前id
             'id_name' => $idName, // 表ID
@@ -20,63 +48,42 @@ class myLog {
         ];
 
         try {
-            if ($logModel == 'file') {
-                $logFilePath = __DIR__ . '/tempImagePath/' . 'ocr_log_' . date('Y-m-d--H', time()) . '.txt';
+            if ( self::$LOG_MODEL == 'file') {
+                // $logFilePath = __DIR__ . '/tempImagePath/' . 'ocr_log_' . date('Y-m-d--H', time()) . '.txt';
+                $logFilePath = self::$LOG_FILE_PATH. '/ocr_log_' . date('Y-m-d--H', time()) . '.txt';
                 file_put_contents($logFilePath, json_encode($image_ocr_log, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
                 $results['code'] = 200;
-                $results['msg'] = '保存成功';
-            } else if ($logModel == 'mysql') {
+                $results['msg'] = 'Successfully ';
+            } else if ( self::$LOG_MODEL  == 'mysql') {
                 // 保存到mysql数据库
-                $mysqli = $myDatabase->getConnection();
-
-                $CREATE_SQL = "CREATE TABLE IF NOT EXISTS `image_ocr_log` (
-                    `id` int NOT NULL AUTO_INCREMENT COMMENT '唯一标识符',
-                    `current_id` int DEFAULT NULL COMMENT '当前id',
-                    `id_name` varchar(40) DEFAULT NULL COMMENT '表ID',
-                    `content_name` varchar(40) DEFAULT NULL COMMENT '表内容',
-                    `table_name` varchar(40) DEFAULT NULL COMMENT '表名',
-                    `image_path` varchar(255) DEFAULT NULL COMMENT '图片路径',
-                    `image_size` int DEFAULT NULL COMMENT '图片大小',
-                    `image_path_index` varchar(40) DEFAULT NULL COMMENT '图片路径的MD5值',
-                    `ocr_data_text` text COMMENT 'OCR数据文本',
-                    `create_time` timestamp NULL DEFAULT NULL COMMENT '时间戳',
-                    PRIMARY KEY (`id`),
-                    KEY `image` (`image_path_index`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ";
-
+                $mysqli = self::$MY_DATABASE->getConnection();
                 // 判断表是否存在，不存在则创建
                 $tableName = 'image_ocr_log';
                 $stmt = $mysqli->prepare("SHOW TABLES LIKE '{$tableName}'");
                 if (!$stmt) {
-                    throw new Exception("准备语句失败: " . $mysqli->error);
+                    throw new Exception("failed 准备语句失败: " . $mysqli->error);
                 }
-
                 $stmt->execute();
                 $result = $stmt->get_result();
                 if ($result->num_rows === 0) {
-                    $createStmt = $mysqli->prepare($CREATE_SQL);
+                    $createStmt = $mysqli->prepare(self::$CREATE_SQL);
                     if (!$createStmt) {
-                        throw new Exception("准备创建表语句失败: " . $mysqli->error);
+                        throw new Exception("failed 准备创建表语句失败: " . $mysqli->error);
                     }
-
                     if (!$createStmt->execute()) {
-                        throw new Exception("创建表失败: " . $createStmt->error);
+                        throw new Exception("failed 创建表失败: " . $createStmt->error);
                     }
-
                     $createStmt->close();
                 }
-
                 $stmt->close();
-
                 // 插入数据 prepare $stmt->execute
                 $INSERT_SQL = "INSERT INTO image_ocr_log (current_id, id_name, content_name, table_name, image_path, image_size, image_path_index, ocr_data_text, create_time) 
                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $mysqli->prepare($INSERT_SQL);
 
                 if (!$stmt) {
-                    throw new Exception("准备语句失败: " . $mysqli->error);
+                    throw new Exception("failed 准备语句失败: " . $mysqli->error);
                 }
-
                 $stmt->bind_param(
                     'issssisss',
                     $image_ocr_log['current_id'],
@@ -96,7 +103,7 @@ class myLog {
 
                 $stmt->close();
                 $results['code'] = 200;
-                $results['msg'] = '保存成功';
+                $results['msg'] = 'Successfully';
             } else {
                 $results['code'] = 500;
                 $results['msg'] = 'log model error';
@@ -106,7 +113,11 @@ class myLog {
             $results['msg'] = $e->getMessage() . "--" . $e->getLine();
         }
 
-        $results['data']['logmodel'] = $logModel;
+        $results['data']['logmodel'] = self::$LOG_MODEL ;
         return $results;
     }
+
+    public function __clone() {}
+public function __wakeup() {}
+
 }

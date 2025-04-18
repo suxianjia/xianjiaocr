@@ -1,6 +1,7 @@
 <?php 
-namespace xianjiaocr;
-
+namespace Suxianjia\xianjiaocr;
+use Exception;
+use CURLFile;
 
 class OCRClient {
     private $url;
