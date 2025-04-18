@@ -16,6 +16,7 @@ https://github.com/suxianjia/xianjiaocr
 https://packagist.org/packages/submit
  
 
- 
+ // 使用方法  cd /ocr/code/demo   &&  php82 test.php 
+
 
 php82 composer-php82.phar update

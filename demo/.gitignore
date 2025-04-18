@@ -1,2 +1,4 @@
 !.gitignore
-temp
+temp/*
+index.php
+index.html
