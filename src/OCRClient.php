@@ -60,16 +60,18 @@ public static function compressImage($imagePath): array {
             throw new Exception('Compressed image still exceeds the maximum size of 3MB.');
         }
 
+        $filesize = filesize($compressedImagePath);
+
         $results = [
             'code' => 200, 
             'msg' => 'Image compressed successfully.', 
             'data' => [
-                'fileSize'=> filesize($compressedImagePath),
+                'fileSize'=>   $filesize  ,
                 'imagePath'=>$compressedImagePath
             ] 
         ];
     } catch (Exception $e) {
-        $results['msg'] = 'Image compression error: ' . $e->getMessage();
+        $results['msg'] = 'Image compression error: ' . $e->getMessage().'--> '. $e->getLine();
     }
 
     return $results;
@@ -98,7 +100,7 @@ public function processImage($remoteImagePath): array {
             }
 
         } catch (Exception $e) {
-            $results['msg'] = 'Error: ' . $e->getMessage();
+            $results['msg'] = 'Error: ' . $e->getMessage().'--> '. $e->getLine();
              return $results;
         }
 
@@ -164,7 +166,7 @@ public function processImage($remoteImagePath): array {
         // 删除临时文件
         unlink($tempImagePath);
     } catch (Exception $e) {
-        $results['msg'] = 'Error: ' . $e->getMessage();
+        $results['msg'] = 'Error: ' . $e->getMessage().'--> '. $e->getLine();
     }
 
     return $results;
