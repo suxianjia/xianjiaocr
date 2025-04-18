@@ -55,12 +55,11 @@ public static function compressImage($imagePath): array {
         if (!file_exists($compressedImagePath)) {
             throw new Exception('Failed to create compressed image.');
         }
-
-        if (filesize($compressedImagePath) > $imagesMaxSize) {
+        $filesize = filesize($compressedImagePath);
+        if (   $filesize > $imagesMaxSize) {
             throw new Exception('Compressed image still exceeds the maximum size of 3MB.');
         }
-
-        $filesize = filesize($compressedImagePath);
+ 
 
         $results = [
             'code' => 200, 
@@ -100,7 +99,7 @@ public function processImage($remoteImagePath): array {
             }
 
         } catch (Exception $e) {
-            $results['msg'] = 'Error: ' . $e->getMessage().'--> '. $e->getLine();
+            $results['msg'] = 'Error: 001 ' . $e->getMessage().'--> '. $e->getLine();
              return $results;
         }
 
@@ -109,7 +108,9 @@ public function processImage($remoteImagePath): array {
   
 
             file_put_contents($tempImagePath, $imageData);
-            echo "压缩前 图片大小为：" .  filesize($tempImagePath) .'/'.self::$imagesMaxSize .PHP_EOL;
+            $filesize = filesize($tempImagePath);
+
+            echo "压缩前 图片大小为：" .   $filesize .'/'.self::$imagesMaxSize .' --> ' . (  $filesize / self::$imagesMaxSize )  .PHP_EOL;
             echo "压缩前 图片路径为：" . $tempImagePath .PHP_EOL;  
             if(filesize($tempImagePath) == 0 ){
                 throw new Exception('Image file not found: ' . $tempImagePath);
@@ -166,7 +167,7 @@ public function processImage($remoteImagePath): array {
         // 删除临时文件
         unlink($tempImagePath);
     } catch (Exception $e) {
-        $results['msg'] = 'Error: ' . $e->getMessage().'--> '. $e->getLine();
+        $results['msg'] = 'Error: 003 ' . $e->getMessage().'--> '. $e->getLine();
     }
 
     return $results;

@@ -120,7 +120,7 @@ class Appocr {
                 $stmt->close();
             }
         } catch (Exception $e) {
-            $results = ['code' => 500, 'msg' => 'Error: ' . $e->getMessage(), 'data' => []   ];
+            $results = ['code' => 500, 'msg' => 'Error: 002 ' . $e->getMessage() .'---' . $e->getLine(), 'data' => []   ];
         } finally {
             $myDatabase->close();
         }
