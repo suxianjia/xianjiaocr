@@ -76,32 +76,88 @@ class myLogClient {
                     $createStmt->close();
                 }
                 $stmt->close();
-                // 插入数据 prepare $stmt->execute
-                $INSERT_SQL = "INSERT INTO image_ocr_log (current_id, id_name, content_name, table_name, image_path, image_size, image_path_index, ocr_data_text, create_time) 
-                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $mysqli->prepare($INSERT_SQL);
 
-                if (!$stmt) {
-                    throw new Exception("failed 准备语句失败: " . $mysqli->error);
-                }
-                $stmt->bind_param(
-                    'issssisss',
-                    $image_ocr_log['current_id'],
-                    $image_ocr_log['id_name'],
-                    $image_ocr_log['content_name'],
-                    $image_ocr_log['table_name'],
-                    $image_ocr_log['image_path'],
-                    $image_ocr_log['image_size'],
-                    $image_ocr_log['image_path_index'],
-                    $image_ocr_log['ocr_data_text'],
-                    $image_ocr_log['create_time']
-                );
+             
+                    // Check if a record with the same image_path_index exists
+                    $SELECT_SQL = "SELECT id FROM image_ocr_log WHERE image_path_index = ?";
+                    $stmt = $mysqli->prepare($SELECT_SQL);
 
-                if (!$stmt->execute()) {
-                    throw new Exception("插入数据失败: " . $stmt->error);
-                }
+                    if (!$stmt) {
+                        throw new Exception("failed 准备查询语句失败: " . $mysqli->error);
+                    }
 
-                $stmt->close();
+                    $stmt->bind_param('s', $image_ocr_log['image_path_index']);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+
+                    if ($result->num_rows > 0) {
+                        // Record exists, update it
+                        $UPDATE_SQL = "UPDATE image_ocr_log SET 
+                            current_id = ?, 
+                            id_name = ?, 
+                            content_name = ?, 
+                            table_name = ?, 
+                            image_path = ?, 
+                            image_size = ?, 
+                            ocr_data_text = ?, 
+                            create_time = ? 
+                            WHERE image_path_index = ?";
+                        $updateStmt = $mysqli->prepare($UPDATE_SQL);
+
+                        if (!$updateStmt) {
+                            throw new Exception("failed 准备更新语句失败: " . $mysqli->error);
+                        }
+
+                        $updateStmt->bind_param(
+                            'issssisss',
+                            $image_ocr_log['current_id'],
+                            $image_ocr_log['id_name'],
+                            $image_ocr_log['content_name'],
+                            $image_ocr_log['table_name'],
+                            $image_ocr_log['image_path'],
+                            $image_ocr_log['image_size'],
+                            $image_ocr_log['ocr_data_text'],
+                            $image_ocr_log['create_time'],
+                            $image_ocr_log['image_path_index']
+                        );
+
+                        if (!$updateStmt->execute()) {
+                            throw new Exception("更新数据失败: " . $updateStmt->error);
+                        }
+
+                        $updateStmt->close();
+                    } else {
+                        // Record does not exist, insert it
+                        $INSERT_SQL = "INSERT INTO image_ocr_log (current_id, id_name, content_name, table_name, image_path, image_size, image_path_index, ocr_data_text, create_time) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        $insertStmt = $mysqli->prepare($INSERT_SQL);
+
+                        if (!$insertStmt) {
+                            throw new Exception("failed 准备插入语句失败: " . $mysqli->error);
+                        }
+
+                        $insertStmt->bind_param(
+                            'issssisss',
+                            $image_ocr_log['current_id'],
+                            $image_ocr_log['id_name'],
+                            $image_ocr_log['content_name'],
+                            $image_ocr_log['table_name'],
+                            $image_ocr_log['image_path'],
+                            $image_ocr_log['image_size'],
+                            $image_ocr_log['image_path_index'],
+                            $image_ocr_log['ocr_data_text'],
+                            $image_ocr_log['create_time']
+                        );
+
+                        if (!$insertStmt->execute()) {
+                            throw new Exception("插入数据失败: " . $insertStmt->error);
+                        }
+
+                        $insertStmt->close();
+                    }
+
+                    $stmt->close();
+             
                 $results['code'] = 200;
                 $results['msg'] = 'Successfully';
             } else {
