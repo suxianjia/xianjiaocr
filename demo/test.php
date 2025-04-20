@@ -1,10 +1,10 @@
 <?php
  include_once __DIR__."/../vendor/autoload.php";
-
+use Suxianjia\xianjiaocr\myConfig;
 use Suxianjia\xianjiaocr\Appocr;
-use Suxianjia\xianjiaocr\OCRClient;
-use Suxianjia\xianjiaocr\myDatabase;
-use Suxianjia\xianjiaocr\myLogClient;  
+// use Suxianjia\xianjiaocr\OCRClient;
+// use Suxianjia\xianjiaocr\myDatabase;
+// use Suxianjia\xianjiaocr\myLogClient;  
  
 
 define('DB_HOST_MASTER', '127.0.01');
@@ -23,14 +23,46 @@ define('OCR_IMAGE_PATH', '1740650492348.jpg');
 define('OCR_OUT_FILE_PATH', 'ocr.json');
 define('OCR_RESPONSE_FORMAT', 'text');
  
-
-$ocrClient = OCRClient::getInstance(OCR_URL, OCR_TOKEN, OCR_MODEL,OCR_RESPONSE_FORMAT,__DIR__.'/temp' );
-$myDatabase = myDatabase::getInstance(DB_HOST_MASTER    ,  DB_USERNAME_MASTER   , DB_PASSWORD_MASTER ,DB_DATABASE_MASTER , DB_PORT_MASTER);
-$logClient = myLogClient::getInstance(__DIR__.'/temp','mysql', $myDatabase );
-$App =   Appocr::getInstance('ypc_news_base' , 'article_content','article_id' );  
-$result = $App->processAllArticles($ocrClient, $myDatabase,$logClient);
+myConfig::getInstance()->set('version', 'v1.0.1');
+// Database configuration
+myConfig::getInstance()->set('db', [
+    'host' => DB_HOST_MASTER,
+    'port' => DB_PORT_MASTER,
+    'database' => DB_DATABASE_MASTER,
+    'username' => DB_USERNAME_MASTER,
+    'password' => DB_PASSWORD_MASTER,
+]);
+// ocr
+myConfig::getInstance()->set('ocr', [
+    'url' => OCR_URL,
+    'token' => OCR_TOKEN,
+    'model' => OCR_MODEL,
+    'image_path' => OCR_IMAGE_PATH,
+    'out_file_path' => OCR_OUT_FILE_PATH,
+    'response_format' => OCR_RESPONSE_FORMAT,
+]);
+//log
+myConfig::getInstance()->set('log', [
+    'path' => __DIR__.'/temp',
+    'type' => 'mysql',
+ 
+]);
+// modelinfo
+myConfig::getInstance()->set('modelinfo', [
+    'table_name' => 'ypc_news_base',
+    'content_name' => 'article_content',
+    'id_name' => 'article_id',
+]);
+// Set the table name, content name, and ID name
+ 
+myConfig::getInstance()->save();
+myConfig::getInstance()->reload();
+ 
+$App =   Appocr::getInstance( );   
+$result = $App->processAllArticles();
 
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
+
 
 
 

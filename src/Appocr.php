@@ -1,10 +1,11 @@
 <?php 
 namespace Suxianjia\xianjiaocr;
-
+use Suxianjia\xianjiaocr\myConfig;
 use Exception;
 use Suxianjia\xianjiaocr\OCRClient;
 use Suxianjia\xianjiaocr\myDatabase;
 use Suxianjia\xianjiaocr\myLogClient;
+
 
 class Appocr {
     private static  $tableName = '';
@@ -13,15 +14,25 @@ class Appocr {
  
 
     private static $instance = null;
+ 
 
     private function __construct() {
         // Private constructor to prevent direct instantiation
     }
+//     public static function getInstance(string $tableName, string $contentName, string $idName): Appocr {
+    public static function getInstance(): Appocr { 
 
-    public static function getInstance(string $tableName, string $contentName, string $idName): Appocr {
-        self::$tableName = $tableName;
-        self::$contentName = $contentName;
-        self::$idName = $idName;
+        // Load all configuration settings from myConfig
+        $config = myConfig::getAllConfig();
+        if (isset($config['tableName'])) {
+            self::$tableName = $config['tableName'];
+        }
+        if (isset($config['contentName'])) {
+            self::$contentName = $config['contentName'];
+        }
+        if (isset($config['idName'])) {
+            self::$idName = $config['idName'];
+        }
 
         if (self::$instance === null) {
             self::$instance = new self();
@@ -31,9 +42,11 @@ class Appocr {
 
  
 
-    private function reSaveArticleToDatabase(string $table_ontent, int $table_id, myDatabase $myDatabase) : array   {
+    private function reSaveArticleToDatabase(string $table_ontent, int $table_id) : array   {
+   
+
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []   ];
-        $mysqli = $myDatabase->getConnection();
+        $mysqli = myDatabase::getInstance()->getConnection();
         try {
             $stmt = $mysqli->prepare("UPDATE `".self::$tableName."` SET `".self::$contentName."` = ? WHERE `".self::$idName."` = ?");
             if (!$stmt) {
@@ -48,14 +61,18 @@ class Appocr {
             $stmt->close();
         } catch (Exception $e) {
             $results = ['code' => 500, 'msg' => 'Database error: ' . $e->getMessage(), 'data' => []  ];
+            myLogClient::getInstance()::writeErrorLog('Error message', var_export(  $results , true));
         }
         return $results;
     }
 
-    public function processAllArticles(OCRClient $ocrClient, myDatabase $myDatabase, myLogClient $logClient): array {
+    public function processAllArticles(): array {
+       
         $results = ['code' => 500, 'msg' => 'Failed', 'data' =>  []  ];
         try {
-            $mysqli = $myDatabase->getConnection();
+        
+
+            $mysqli = myDatabase::getInstance()->getConnection();
             $pageSize = 1000;
             $pageCount = $mysqli->query("SELECT COUNT(*) FROM `".self::$tableName."` ")->fetch_row()[0];
             $maxPages = ceil($pageCount / $pageSize);
@@ -84,7 +101,7 @@ class Appocr {
 
                     foreach ($imagePaths as $imagePath) {
                         $ocrDatatext = '';
-                        $ocrResult = $ocrClient->processImage($imagePath);
+                        $ocrResult = OCRClient::getInstance()->processImage($imagePath);
 
                         if ($ocrResult['code'] === 200 && isset($ocrResult['data'])) {
                             $ocrData = $ocrResult['data'];
@@ -107,7 +124,7 @@ class Appocr {
 
                 
 
-                        $logClient::writeLog( $table_id, self::$idName, self::$contentName, self::$tableName, $imagePath, $ocrDatatext );
+                        myLogClient::getInstance()::writeLog( $table_id, self::$idName, self::$contentName, self::$tableName, $imagePath, $ocrDatatext );
                     }
 
                     $saveResult = $this->reSaveArticleToDatabase($table_ontent, $table_id, $myDatabase);
@@ -121,6 +138,7 @@ class Appocr {
             }
         } catch (Exception $e) {
             $results = ['code' => 500, 'msg' => 'Error: 002 ' . $e->getMessage() .'---' . $e->getLine(), 'data' => []   ];
+            myLogClient::getInstance()::writeErrorLog('Error message', var_export(  $results , true));
         } finally {
             $myDatabase->close();
         }

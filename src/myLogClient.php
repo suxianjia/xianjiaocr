@@ -1,7 +1,7 @@
 <?php
 namespace Suxianjia\xianjiaocr;
 use Exception;
-
+use Suxianjia\xianjiaocr\myConfig;
 class myLogClient {
     private static $instance = null;
     private static   $CREATE_SQL = "CREATE TABLE IF NOT EXISTS `image_ocr_log` (
@@ -22,7 +22,31 @@ class myLogClient {
     private static $LOG_MODEL;
 
     private static $MY_DATABASE;
-    public static function getInstance( $logFilePath ,$logmodel,$myDatabase ) {
+    // public static function getInstance( $logFilePath ,$logmodel,$myDatabase ) {
+    
+    public static function getInstance(   ) {
+         // Load all configuration settings from myConfig
+        $config = myConfig::getAllConfig();
+        if (isset($config['log'])) {
+            $logConfig = $config['log'];
+            $logFilePath = $logConfig['path'] ?? $logFilePath;
+            $logmodel = $logConfig['type'] ?? $logmodel;
+            // $myDatabase = $logConfig['db'] ?? $myDatabase;
+        }
+        if (self::$LOG_MODEL == 'mysql') {
+            $myDatabase = myDatabase::getInstance();
+        } else {
+            $myDatabase = null;
+        }
+        if (self::$LOG_FILE_PATH == null) {
+            self::$LOG_FILE_PATH = $logFilePath;
+        }
+        if (self::$LOG_MODEL == null) {
+            self::$LOG_MODEL = $logmodel;
+        }
+        if (self::$MY_DATABASE == null) {
+            self::$MY_DATABASE = $myDatabase;
+        }
         if (self::$instance === null) {
             self::$instance = new self();
         }
@@ -31,6 +55,31 @@ class myLogClient {
         self::$MY_DATABASE = $myDatabase;
         return self::$instance;
     }
+    public function __destruct() {
+        // Close the database connection if it exists
+        if (self::$MY_DATABASE) {
+            self::$MY_DATABASE->close();
+        }
+    }
+    public function getLogModel() {
+        return self::$LOG_MODEL;
+    }
+    public function getLogFilePath() {
+        return self::$LOG_FILE_PATH;
+    }
+    public function getMyDatabase() {
+        return self::$MY_DATABASE;
+    }
+    public function getCreateSql() {
+        return self::$CREATE_SQL;
+    }
+    // 写入错误日志  myLogClient::getInstance()::writeErrorLog('Error message');
+    public static function writeErrorLog(string $errorMessage, string $str =""): void {
+        $logFilePath = self::$LOG_FILE_PATH . '/error_log_' . date('Y-m-d--H', time()) . '.txt';
+        file_put_contents($logFilePath, $errorMessage.':' $str . PHP_EOL, FILE_APPEND);
+    }
+
+    // 写入执行日志
 
     public  static function writeLog( int $current_id, string $idName, string $contentName, string $tableName,  string $imagePath, string $ocrDataText): array {
         $results = ['code' => 500, 'msg' => 'Failed', 'data' => []];
@@ -48,13 +97,13 @@ class myLogClient {
         ];
 
         try {
-            if ( self::$LOG_MODEL == 'file') {
+            if ( self::getLogModel()  == 'file') {
                 // $logFilePath = __DIR__ . '/tempImagePath/' . 'ocr_log_' . date('Y-m-d--H', time()) . '.txt';
                 $logFilePath = self::$LOG_FILE_PATH. '/ocr_log_' . date('Y-m-d--H', time()) . '.txt';
                 file_put_contents($logFilePath, json_encode($image_ocr_log, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
                 $results['code'] = 200;
                 $results['msg'] = 'Successfully ';
-            } else if ( self::$LOG_MODEL  == 'mysql') {
+            } else if (  self::getLogModel()    == 'mysql') {
                 // 保存到mysql数据库
                 $mysqli = self::$MY_DATABASE->getConnection();
                 // 判断表是否存在，不存在则创建
@@ -79,7 +128,7 @@ class myLogClient {
 
              
                     // Check if a record with the same image_path_index exists
-                    $SELECT_SQL = "SELECT id FROM image_ocr_log WHERE image_path_index = ?";
+                    $SELECT_SQL = "SELECT `id` FROM `image_ocr_log` WHERE `image_path_index` = ?";
                     $stmt = $mysqli->prepare($SELECT_SQL);
 
                     if (!$stmt) {
@@ -92,7 +141,7 @@ class myLogClient {
 
                     if ($result->num_rows > 0) {
                         // Record exists, update it
-                        $UPDATE_SQL = "UPDATE image_ocr_log SET 
+                        $UPDATE_SQL = "UPDATE `image_ocr_log` SET 
                             current_id = ?, 
                             id_name = ?, 
                             content_name = ?, 

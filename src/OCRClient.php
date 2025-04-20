@@ -2,7 +2,7 @@
 namespace Suxianjia\xianjiaocr;
 use Exception;
 use CURLFile;
-
+use Suxianjia\xianjiaocr\myConfig;
 class OCRClient {
     private $url;
     private $token;
@@ -71,6 +71,7 @@ public static function compressImage($imagePath): array {
         ];
     } catch (Exception $e) {
         $results['msg'] = 'Image compression error: ' . $e->getMessage().'--> '. $e->getLine();
+        myLogClient::getInstance()::writeErrorLog('Error message', var_export(  $results , true));
     }
 
     return $results;
@@ -80,6 +81,57 @@ public function __clone() {}
 public function __wakeup() {}
 
 public static function getInstance(string $url,string  $token, string  $model, $responseFormat = 'json', string $tempImagePathString) {
+          // Load all configuration settings from myConfig
+          $config = myConfig::getAllConfig();
+    if (isset($config['ocr'])) {
+        $ocrConfig = $config['ocr'];
+        $url = $ocrConfig['url'] ?? $url;
+        $token = $ocrConfig['token'] ?? $token;
+        $model = $ocrConfig['model'] ?? $model;
+        $responseFormat = $ocrConfig['response_format'] ?? $responseFormat;
+        // $tempImagePathString = $ocrConfig['image_path'] ?? $tempImagePathString;
+    }
+    if (self::$TEMP_IMAGE_PATH == null) {
+        self::$TEMP_IMAGE_PATH = $tempImagePathString;
+    }
+    if (self::$TEMP_IMAGE_PATH == null) {
+        self::$TEMP_IMAGE_PATH = __DIR__ . '/temp';
+    }
+    if (!is_dir(self::$TEMP_IMAGE_PATH)) {
+        mkdir(self::$TEMP_IMAGE_PATH, 0777, true);
+    }
+    if (!is_writable(self::$TEMP_IMAGE_PATH)) {
+        throw new Exception('Temporary image path is not writable: ' . self::$TEMP_IMAGE_PATH);
+    }
+    if (!is_readable(self::$TEMP_IMAGE_PATH)) {
+        throw new Exception('Temporary image path is not readable: ' . self::$TEMP_IMAGE_PATH);
+    }
+    if (!is_dir(self::$TEMP_IMAGE_PATH)) {
+        mkdir(self::$TEMP_IMAGE_PATH, 0777, true);
+    }
+    if (!is_writable(self::$TEMP_IMAGE_PATH)) {
+        throw new Exception('Temporary image path is not writable: ' . self::$TEMP_IMAGE_PATH);
+    }
+    if (!is_readable(self::$TEMP_IMAGE_PATH)) {
+        throw new Exception('Temporary image path is not readable: ' . self::$TEMP_IMAGE_PATH);
+    }
+    if (!is_dir(self::$TEMP_IMAGE_PATH)) {
+        mkdir(self::$TEMP_IMAGE_PATH, 0777, true);
+    }
+    if (!is_writable(self::$TEMP_IMAGE_PATH)) {
+        throw new Exception('Temporary image path is not writable: ' . self::$TEMP_IMAGE_PATH);
+    }
+    if (!is_readable(self::$TEMP_IMAGE_PATH)) {
+        throw new Exception('Temporary image path is not readable: ' . self::$TEMP_IMAGE_PATH);
+    }
+    if (!is_dir(self::$TEMP_IMAGE_PATH)) {
+        mkdir(self::$TEMP_IMAGE_PATH, 0777, true);
+    }
+    if (!is_writable(self::$TEMP_IMAGE_PATH)) {
+        throw new Exception('Temporary image path is not writable: ' . self::$TEMP_IMAGE_PATH);
+    }
+   
+   
     self::$TEMP_IMAGE_PATH = $tempImagePathString;
     if (self::$instance === null) {
         self::$instance = new self($url, $token, $model, $responseFormat);
@@ -168,6 +220,7 @@ public function processImage($remoteImagePath): array {
         unlink($tempImagePath);
     } catch (Exception $e) {
         $results['msg'] = 'Error: 003 ' . $e->getMessage().'--> '. $e->getLine();
+        myLogClient::getInstance()::writeErrorLog('Error message', var_export(  $results , true));
     }
 
     return $results;
