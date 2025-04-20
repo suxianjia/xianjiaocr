@@ -1,8 +1,9 @@
 <?php 
-namespace Suxianjia\xianjiaocr;
+namespace Suxianjia\xianjiaocr\orm;
 use Exception;
 use mysqli;
 use Suxianjia\xianjiaocr\myConfig;
+use Suxianjia\xianjiaocr\client\myLogClient;
 
 class myDatabase {
     private $database_type = 'mysqli';

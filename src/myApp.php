@@ -2,12 +2,12 @@
 namespace Suxianjia\xianjiaocr;
 use Suxianjia\xianjiaocr\myConfig;
 use Exception;
-use Suxianjia\xianjiaocr\OCRClient;
-use Suxianjia\xianjiaocr\myDatabase;
-use Suxianjia\xianjiaocr\myLogClient;
+use Suxianjia\xianjiaocr\client\OCRClient;
+use Suxianjia\xianjiaocr\orm\myDatabase;
+use Suxianjia\xianjiaocr\client\myLogClient;
 
 
-class Appocr {
+class myApp {
     private static  $tableName = '';
     private static $contentName = '';
     private static $idName = '';
@@ -20,7 +20,7 @@ class Appocr {
         // Private constructor to prevent direct instantiation
     }
 //     public static function getInstance(string $tableName, string $contentName, string $idName): Appocr {
-    public static function getInstance(): Appocr { 
+    public static function getInstance(): myApp { 
 
         // Load all configuration settings from myConfig
         $config = myConfig::getAllConfig();

@@ -1,8 +1,9 @@
 <?php 
-namespace Suxianjia\xianjiaocr;
+namespace Suxianjia\xianjiaocr\client;
 use Exception;
 use CURLFile;
 use Suxianjia\xianjiaocr\myConfig;
+use Suxianjia\xianjiaocr\client\myLogClient;
 class OCRClient {
     private $url;
     private $token;

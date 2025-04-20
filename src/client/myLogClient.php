@@ -1,5 +1,5 @@
 <?php
-namespace Suxianjia\xianjiaocr;
+namespace Suxianjia\xianjiaocr\client;
 use Exception;
 use Suxianjia\xianjiaocr\myConfig;
 class myLogClient {
@@ -19,6 +19,10 @@ class myLogClient {
         KEY `image` (`image_path_index`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ";
     private static $LOG_FILE_PATH;
+    //  'runtime_path' => __DIR__.'/../runtime',
+    private static $RUNTIME_LOG_FILE_PATH; // 运行时路径
+
+
     private static $LOG_MODEL;
 
     private static $MY_DATABASE;
@@ -30,6 +34,9 @@ class myLogClient {
         if (isset($config['log'])) {
             $logConfig = $config['log'];
             $logFilePath = $logConfig['path'] ?? $logFilePath;
+            //  运行时路径
+            self::$RUNTIME_LOG_FILE_PATH = $logConfig['runtime_path'] ?? $logFilePath;
+
             $logmodel = $logConfig['type'] ?? $logmodel;
             // $myDatabase = $logConfig['db'] ?? $myDatabase;
         }

@@ -24,6 +24,7 @@ return [
     'log' => [
         'path' => __DIR__.'/temp',
         'type' => 'mysql',
+        'runtime_path' => __DIR__.'/../runtime',
  
     ],
 

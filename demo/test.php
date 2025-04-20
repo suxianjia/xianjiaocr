@@ -1,7 +1,7 @@
 <?php
  include_once __DIR__."/../vendor/autoload.php";
 use Suxianjia\xianjiaocr\myConfig;
-use Suxianjia\xianjiaocr\Appocr;
+use Suxianjia\xianjiaocr\myApp;
 // use Suxianjia\xianjiaocr\OCRClient;
 // use Suxianjia\xianjiaocr\myDatabase;
 // use Suxianjia\xianjiaocr\myLogClient;  
@@ -45,6 +45,7 @@ myConfig::getInstance()->set('ocr', [
 myConfig::getInstance()->set('log', [
     'path' => __DIR__.'/temp',
     'type' => 'mysql',
+    'runtime_path' => __DIR__.'/runtime',
  
 ]);
 // modelinfo
@@ -58,7 +59,7 @@ myConfig::getInstance()->set('modelinfo', [
 myConfig::getInstance()->save();
 myConfig::getInstance()->reload();
  
-$App =   Appocr::getInstance( );   
+$App =   myApp::getInstance( );   
 $result = $App->processAllArticles();
 
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
