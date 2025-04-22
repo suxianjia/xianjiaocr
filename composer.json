@@ -14,6 +14,8 @@
         }
     ],
     "require": {
-        "php": "^8.0|>=8.3.3"
+        "php": "^8.0|>=8.3.3",
+        "suxianjia/xianjialogwriter": "^1.0",
+        "suxianjia/xianjiaorm": "^2.0"
     }
 }
