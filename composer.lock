@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "suxianjia/xianjialogwriter",
-            "version": "v1.0.0",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/suxianjia/xianjialogwriter.git",
-                "reference": "9cd60d95335b49c1dc9509f2ed5c77f661104348"
+                "reference": "13d62511057b70e8e8ff638e6655e6bae76bad75"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/suxianjia/xianjialogwriter/zipball/9cd60d95335b49c1dc9509f2ed5c77f661104348",
-                "reference": "9cd60d95335b49c1dc9509f2ed5c77f661104348",
+                "url": "https://api.github.com/repos/suxianjia/xianjialogwriter/zipball/13d62511057b70e8e8ff638e6655e6bae76bad75",
+                "reference": "13d62511057b70e8e8ff638e6655e6bae76bad75",
                 "shasum": ""
             },
             "require": {
@@ -39,9 +39,9 @@
             "description": "xianjialogwriter",
             "support": {
                 "issues": "https://github.com/suxianjia/xianjialogwriter/issues",
-                "source": "https://github.com/suxianjia/xianjialogwriter/tree/v1.0.0"
+                "source": "https://github.com/suxianjia/xianjialogwriter/tree/v1.0.2"
             },
-            "time": "2025-04-22T08:04:15+00:00"
+            "time": "2025-04-23T00:16:08+00:00"
         },
         {
             "name": "suxianjia/xianjiaorm",
