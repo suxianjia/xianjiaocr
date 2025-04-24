@@ -17,6 +17,8 @@ https://packagist.org/packages/submit
  
 
  // 使用方法  cd /ocr/code/demo   &&  php82 test.php 
+composer              require suxianjia/xianjialogwriter
 
-
+php82 composer82.phar require suxianjia/xianjialogwriter
 php82 composer-php82.phar update
+php82 composer82.phar update

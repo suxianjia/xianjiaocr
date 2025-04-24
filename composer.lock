@@ -4,15 +4,93 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ffe7e23ceff63f80cdaed982d10f237e",
-    "packages": [],
+    "content-hash": "4af5beac3354ff3859a4b939cecf687b",
+    "packages": [
+        {
+            "name": "suxianjia/xianjialogwriter",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/suxianjia/xianjialogwriter.git",
+                "reference": "13d62511057b70e8e8ff638e6655e6bae76bad75"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/suxianjia/xianjialogwriter/zipball/13d62511057b70e8e8ff638e6655e6bae76bad75",
+                "reference": "13d62511057b70e8e8ff638e6655e6bae76bad75",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0|>=8.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Suxianjia\\xianjialogwriter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "xianjia",
+                    "email": "605011288@qq.com"
+                }
+            ],
+            "description": "xianjialogwriter",
+            "support": {
+                "issues": "https://github.com/suxianjia/xianjialogwriter/issues",
+                "source": "https://github.com/suxianjia/xianjialogwriter/tree/v1.0.2"
+            },
+            "time": "2025-04-23T00:16:08+00:00"
+        },
+        {
+            "name": "suxianjia/xianjiaorm",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/suxianjia/xianjiaorm.git",
+                "reference": "5ddc0748a5092f86e0f6c60d8cf772560d85e9a6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/suxianjia/xianjiaorm/zipball/5ddc0748a5092f86e0f6c60d8cf772560d85e9a6",
+                "reference": "5ddc0748a5092f86e0f6c60d8cf772560d85e9a6",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0|>=8.3.3",
+                "suxianjia/xianjialogwriter": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Suxianjia\\xianjiaorm\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "xianjia",
+                    "email": "605011288@qq.com"
+                }
+            ],
+            "description": "xianjiaorm",
+            "support": {
+                "issues": "https://github.com/suxianjia/xianjiaorm/issues",
+                "source": "https://github.com/suxianjia/xianjiaorm/tree/v2.0.0"
+            },
+            "time": "2025-04-22T09:44:28+00:00"
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
+    "platform": {
+        "php": "^8.0|>=8.3.3"
+    },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
